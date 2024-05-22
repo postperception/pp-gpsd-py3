@@ -3,19 +3,19 @@
 from setuptools import setup
 
 setup(
-        name='gpsd-py3',
-        version='0.3.0',
+        name='pp-gpsd-py3',
+        version='1.0.0',
         packages=['gpsd'],
-        url='https://github.com/MartijnBraam/gpsd-py3',
+        url='https://github.com/postperception/pp-gpsd-py3',
         license='MIT',
-        author='Martijn Braam',
-        author_email='martijn@brixit.nl',
-        description='Python 3 library for working with gpsd',
+        author='Sam Liu',
+        author_email='sam@postperception.com',
+        description='Python 3 library for working with gpsd. Forked from gpsd-py3.',
         keywords=["gps", "gpsd"],
         classifiers=[
             "Programming Language :: Python",
             "Programming Language :: Python :: 3",
-            "Development Status :: 4 - Beta",
+            "Development Status :: 5 - Stable",
             "Operating System :: POSIX :: Linux",
             "License :: OSI Approved :: MIT License"
         ],

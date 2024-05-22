@@ -10,12 +10,18 @@ gpsTimeFormat = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 logger = logging.getLogger(__name__)
 
+MODES = {
+    0: 'No mode',
+    1: 'No fix',
+    2: '2D fix',
+    3: '3D fix'
+}
 
 def _parse_state_packet(json_data):
     global state
     if json_data['class'] == 'DEVICES':
         if not json_data['devices']:
-            logger.warn('No gps devices found')
+            logger.warn('No gps devices found; check that /etc/default/gpsd has a populated DEVICES variable.')
         state['devices'] = json_data
     elif json_data['class'] == 'WATCH':
         state['watch'] = json_data
@@ -229,14 +235,9 @@ class GpsResponse(object):
         return time
 
     def __repr__(self):
-        modes = {
-            0: 'No mode',
-            1: 'No fix',
-            2: '2D fix',
-            3: '3D fix'
-        }
+        global MODES
         if self.mode < 2:
-            return "<GpsResponse {}>".format(modes[self.mode])
+            return "<GpsResponse {}>".format(MODES[self.mode])
         if self.mode == 2:
             return "<GpsResponse 2D Fix {} {}>".format(self.lat, self.lon)
         if self.mode == 3:
@@ -284,6 +285,47 @@ def get_current():
             "Unexpected message received from gps: {}".format(response['class']))
     return GpsResponse.from_json(response)
 
+def get_current_as_dict():
+    """ Poll gpsd for a new position
+    :return: GpsResponse
+    """
+    global gpsd_stream, verbose_output, MODES, state
+    logger.debug("Polling gps")
+    gpsd_stream.write("?POLL;\n")
+    gpsd_stream.flush()
+    raw = gpsd_stream.readline()
+    response = json.loads(raw)
+    if response['class'] != 'POLL':
+        raise Exception(
+            "Unexpected message received from gps: {}".format(response['class']))
+    res = GpsResponse.from_json(response)
+
+    # By default, everything is blank.
+    d = {
+        'lat': None,
+        'lon': None,
+        'alt': None,
+        'map_url': None,
+        'dt': None,
+        'mode': MODES[res.mode],
+        'device_state': state,
+    }
+
+    # No position lock; return blank everything.
+    if MODES[res.mode] <= 1:
+      return d
+    
+    # At least a 2D position lock.
+    if MODES[res.mode] >= 2:  
+      d['lat'] = res.lat
+      d['lon'] = res.lon
+      d['map_url'] = f"http://www.openstreetmap.org/?mlat={res.lat}&mlon={res.lon}&zoom=15"
+      d['dt'] = res.get_time()
+
+    # Add altitude since there is a 3D position lock.
+    if MODES[res.mode] == 3:
+      d['alt'] = res.alt
+    return d
 
 def device():
     """ Get information about current gps device
