@@ -1,14 +1,14 @@
 Python3 GPSD client
 ===================
 
-This is a library for polling gpsd in Python3
+This is a library for polling gpsd in Python3.
 
 Installation
 ------------
 
 Install through pip::
 
-    $ pip3 install gpsd-py3
+    $ pip3 install pp-gpsd-py3
 
 Usage
 -----
