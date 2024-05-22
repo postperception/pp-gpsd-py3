@@ -1,7 +1,12 @@
 Python3 GPSD client
 ===================
 
-This is a library for polling gpsd in Python3.
+This is a library for polling gpsd in Python3, forked from `gpsd-py3`.
+
+We forked it to add a couple of things:
+
+1. Warning message to indicate if `/etc/default/gpsd` is correctly configured.
+2. `get_current_as_dict()` to enable synchronous snapshots of useful information from a parsed response.
 
 Installation
 ------------
