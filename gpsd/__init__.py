@@ -312,18 +312,18 @@ def get_current_as_dict():
     }
 
     # No position lock; return blank everything.
-    if MODES[res.mode] <= 1:
+    if res.mode <= 1:
       return d
-    
+
     # At least a 2D position lock.
-    if MODES[res.mode] >= 2:  
+    if res.mode >= 2:
       d['lat'] = res.lat
       d['lon'] = res.lon
       d['map_url'] = f"http://www.openstreetmap.org/?mlat={res.lat}&mlon={res.lon}&zoom=15"
       d['dt'] = res.get_time()
 
     # Add altitude since there is a 3D position lock.
-    if MODES[res.mode] == 3:
+    if res.mode == 3:
       d['alt'] = res.alt
     return d
 
